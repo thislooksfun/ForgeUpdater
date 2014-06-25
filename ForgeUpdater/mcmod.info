@@ -1,0 +1,17 @@
+[
+{
+  "modid": "forgeupdater",
+  "name": "Forge Updater",
+  "description": "A small API that allows mods to automatically check for updates from curse.com. Don't worry though, this can be disabled in the config file",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "logoFile": "",
+  "url": "",
+  "updateUrl": "",
+  "authors": ["thislooksfun"],
+  "credits": "",
+  "parent": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
