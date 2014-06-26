@@ -3,7 +3,7 @@ package com.tlf.forgeupdater.common;
 import java.lang.annotation.Annotation;
 import java.util.Iterator;
 
-import com.tlf.forgeupdater.annotation.UpdateCheck;
+import com.tlf.forgeupdater.annotation.Updater;
 import com.tlf.forgeupdater.checker.UpdateChecker;
 
 import cpw.mods.fml.common.Loader;
@@ -16,7 +16,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = ForgeUpdater.MODID, name = ForgeUpdater.NAME, version = ForgeUpdater.VERSION)
-@UpdateCheck(curseID = "")
+@Updater(curseID = "")
 public class ForgeUpdater
 {
 	public static final String MODID = "forgeupdater";
@@ -53,14 +53,14 @@ public class ForgeUpdater
 				System.out.println("Mod name: " + name);
 				System.out.println("Mod class: " + (clazz == null ? "null" : clazz.getName()));
 				
-				if (clazz.isAnnotationPresent(UpdateCheck.class)) {
+				if (clazz.isAnnotationPresent(Updater.class)) {
 					Annotation[] annotations = clazz.getAnnotations();
 					
 					System.out.println("\n-----------");
 					System.out.println("Checking annotations for " + name);
 					for (Annotation ann : annotations) {
-						if (ann instanceof UpdateCheck) {
-							UpdateCheck checker = (UpdateCheck)ann;
+						if (ann instanceof Updater) {
+							Updater checker = (Updater)ann;
 							
 							checker.curseID();
 						}

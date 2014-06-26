@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 @Retention(value = RUNTIME)
 @Target(value = TYPE)
-public @interface UpdateCheck
+public @interface Updater
 {
 	/** The curse link to your mod. Get it from <code>curse.com/mc-mods/minecraft/[curse link] */
 	String curseID();
