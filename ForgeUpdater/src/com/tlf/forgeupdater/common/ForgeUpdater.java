@@ -1,22 +1,26 @@
 package com.tlf.forgeupdater.common;
 
-import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 
-import com.tlf.forgeupdater.annotation.Updater;
+import com.tlf.forgeupdater.checker.UpdateCheckManager;
 import com.tlf.forgeupdater.checker.UpdateChecker;
+import com.tlf.forgeupdater.checker.UpdateChecker.UpdateType;
+import com.tlf.forgeupdater.event.EventHandlerCPW;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.ModContainer;
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = ForgeUpdater.MODID, name = ForgeUpdater.NAME, version = ForgeUpdater.VERSION)
-@Updater(curseID = "")
 public class ForgeUpdater
 {
 	public static final String MODID = "forgeupdater";
@@ -33,43 +37,27 @@ public class ForgeUpdater
 	@EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {}
 	@EventHandler
-	public void onInit(FMLInitializationEvent event) {}
-	@EventHandler
-	public void onPostInit(FMLPostInitializationEvent event)
-	{
-		Iterator<ModContainer> iterator = Loader.instance().getActiveModList().iterator();
-		
-		System.out.println("\n===========");
-		System.out.println("Checking mods...");
-		while (iterator.hasNext())
-		{
-			ModContainer mc = iterator.next();
-			String name = mc.getName();
-			Object mod = mc.getMod();
-			Class clazz = mod == null ? null : mod.getClass();
-			
-			if (!name.equals("Minecraft Coder Pack") && !name.equals("Forge Mod Loader") && !name.equals("Minecraft Forge"))
-			{
-				System.out.println("Mod name: " + name);
-				System.out.println("Mod class: " + (clazz == null ? "null" : clazz.getName()));
-				
-				if (clazz.isAnnotationPresent(Updater.class)) {
-					Annotation[] annotations = clazz.getAnnotations();
-					
-					System.out.println("\n-----------");
-					System.out.println("Checking annotations for " + name);
-					for (Annotation ann : annotations) {
-						if (ann instanceof Updater) {
-							Updater checker = (Updater)ann;
-							
-							checker.curseID();
-						}
-					}
-					System.out.println("-----------\n");
-					//System.out.println("Updating!);
-				}
-			}
-		}
-		System.out.println("\n===========");
+	public void onInit(FMLInitializationEvent event) {
+		FMLCommonHandler.instance().bus().register(new EventHandlerCPW());
 	}
+	@EventHandler
+	public void onPostInit(FMLPostInitializationEvent event) {
+		UpdateCheckManager.INSTANCE.getUpdaters();
+	}
+	
+	/** The CurseID for your mod. Find it at curse.com/mc-mods/minecraft/[curseID ]*/
+	@Optional.Method(modid = "forgeupdater")
+	public String curseID() { return ""; }
+	
+	/** The file formats to use for this mod, where $mc = minecraft version; $v = mod version. Example: "Hide_Names-$mc-$v.jar" */
+	@Optional.Method(modid = "forgeupdater")
+	public String fileFormat() { return ""; }
+	
+	/** The file formats to use for this mod. See {@link #fileFormat()} */
+	@Optional.Method(modid = "forgeupdater")
+	public String[] fileFormats() { return new String[]{""}; }
+	
+	/** The minimum release type to be checked for. 0 = release; 1 = beta; 2 = alpha. Example: 1 will allow beta and release builds, but not alpha. */
+	@Optional.Method(modid = "forgeupdater")
+	public int minType() { return 0; }
 }
