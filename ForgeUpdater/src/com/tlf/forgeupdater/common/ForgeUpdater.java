@@ -1,20 +1,13 @@
 package com.tlf.forgeupdater.common;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Iterator;
-
 import com.tlf.forgeupdater.checker.UpdateCheckManager;
 import com.tlf.forgeupdater.checker.UpdateChecker;
-import com.tlf.forgeupdater.checker.UpdateChecker.UpdateType;
 import com.tlf.forgeupdater.event.EventHandlerCPW;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -27,7 +20,6 @@ public class ForgeUpdater
 	public static final String NAME = "Forge Updater";
 	public static final String VERSION = "0.0.1 pre-alpha";
 	
-	//** 
 	public static UpdateChecker checker;
 	
 	/** The public instance */
