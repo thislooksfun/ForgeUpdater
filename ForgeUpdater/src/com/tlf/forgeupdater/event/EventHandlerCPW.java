@@ -1,6 +1,7 @@
 package com.tlf.forgeupdater.event;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
@@ -25,9 +26,13 @@ public class EventHandlerCPW
 	@SubscribeEvent
 	public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
 	{
-		if (!client && (MinecraftServer.getServer().isSinglePlayer() || MinecraftServer.getServer().getConfigurationManager().getOps().contains(event.player.getCommandSenderName().toLowerCase())))
+		if (MinecraftServer.getServer().isSinglePlayer() || (!client && MinecraftServer.getServer().getConfigurationManager().getOps().contains(event.player.getCommandSenderName().toLowerCase())))
 		{
-			Iterator<UpdateChecker> iterator = UpdateCheckManager.INSTANCE.getCheckersWithUpdate().iterator();
+			Set<UpdateChecker> set = UpdateCheckManager.INSTANCE.getCheckersWithUpdate();
+			
+			event.player.addChatMessage(new ChatComponentText("Checkers with update: " + set.size()));
+			
+			Iterator<UpdateChecker> iterator = set.iterator();
 			
 			while (iterator.hasNext())
 			{
