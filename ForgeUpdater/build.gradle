@@ -17,7 +17,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.7.2-0.0.1 pre-alpha"
+version = "1.7.2-1.0.0"
 group = "com.tlf.forgeupdater"
 archivesBaseName = "Forge Updater"
 
