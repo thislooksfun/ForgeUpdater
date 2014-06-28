@@ -37,12 +37,17 @@ The file formats to use for this mod, if it has more than one. See the previous 
 
 ```java
 @Optional.Method(modid = "forgeupdater")
-public String[] fileFormats() { return new String[]{"Forge_Updater-$mc-$v.jar"}; }
+public String[] fileFormats() {
+  return new String[]{"Forge_Updater-$mc-$v.jar"};
+}
 ```
+
 
 The minimum release type to be checked for. 0 = release; 1 = beta; 2 = alpha. Example: 1 will allow beta and release builds, but not alpha.
 
 ```java
 @Optional.Method(modid = "forgeupdater")
-public int minType() { return 0; }
+public int minType() {
+  return 0;
+}
 ```
