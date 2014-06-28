@@ -1,14 +1,13 @@
 package com.tlf.forgeupdater.event;
 
-import java.util.Iterator;
-import java.util.Set;
-
+import net.minecraft.event.ClickEvent;
+import net.minecraft.event.HoverEvent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
+import net.minecraft.util.EnumChatFormatting;
 
 import com.tlf.forgeupdater.checker.UpdateCheckManager;
-import com.tlf.forgeupdater.checker.UpdateChecker;
-import com.tlf.forgeupdater.common.ForgeUpdater;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -28,18 +27,16 @@ public class EventHandlerCPW
 	{
 		if (MinecraftServer.getServer().isSinglePlayer() || (!client && MinecraftServer.getServer().getConfigurationManager().getOps().contains(event.player.getCommandSenderName().toLowerCase())))
 		{
-			Set<UpdateChecker> set = UpdateCheckManager.INSTANCE.getCheckersWithUpdate();
-			
-			event.player.addChatMessage(new ChatComponentText("Checkers with update: " + set.size()));
-			
-			Iterator<UpdateChecker> iterator = set.iterator();
-			
-			while (iterator.hasNext())
-			{
-				UpdateChecker checker = iterator.next();
+			int updates = UpdateCheckManager.INSTANCE.getCheckersWithUpdate().size();
+			if (updates > 0) {
+				String msg = "There "+(updates == 1 ? "is " : "are ")+EnumChatFormatting.RED+updates+EnumChatFormatting.AQUA+" mod"+(updates == 1 ? "" : "s")+" with"+(updates == 1 ? " a" : "")+" new version"+(updates == 1 ? "" : "s")+".";
+				event.player.addChatMessage(new ChatComponentText(msg).setChatStyle(new ChatStyle().setColor(EnumChatFormatting.AQUA)));
 				
-				event.player.addChatMessage(new ChatComponentText("Version "+checker.updateVersion()+" of "+ForgeUpdater.checker.MODNAME+" available! (You are "+checker.versionsBehind()+" versions behind)"));
-				event.player.addChatMessage(new ChatComponentText(checker.updateURL()));
+				ChatComponentText chatComponentBody = new ChatComponentText("For more information, please type ");
+				ChatComponentText chatComponentLink = new ChatComponentText("/updates");
+				chatComponentLink.setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED).setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/updates")).setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("/updates").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)))));
+				chatComponentBody.setChatStyle(new ChatStyle().setColor(EnumChatFormatting.AQUA)).appendSibling(chatComponentLink);
+				event.player.addChatMessage(chatComponentBody);
 			}
 		}
 	}
