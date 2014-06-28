@@ -10,6 +10,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
+import net.minecraftforge.common.MinecraftForge;
+
 import com.tlf.forgeupdater.JSON.JSONArray;
 import com.tlf.forgeupdater.JSON.JSONException;
 import com.tlf.forgeupdater.JSON.JSONObject;
@@ -19,19 +21,21 @@ import cpw.mods.fml.common.ModContainer;
 public class UpdateChecker
 {
 	protected boolean hasUpdate = false;
-	protected String updateURL = "";
-	protected String updateVersion = "";
+	protected String updateURL;
+	protected String updateVersion;
 	protected int versionsBehind = 0;
 	
 	public final String MODVERSION;
 	public final String MODNAME;
 	public final String CURSEID;
+	public final String MODID;
 	public final UpdateType MINTYPE;
 	
 	public UpdateChecker(ModContainer mc, String curseID, UpdateType minType, String[] fileFormats)
 	{
 		this.MODVERSION = mc.getVersion();
 		this.MODNAME = mc.getName();
+		this.MODID = mc.getModId();
 		this.CURSEID = curseID;
 		this.MINTYPE = (minType == null ? UpdateType.RELEASE : minType);
 		
@@ -45,15 +49,18 @@ public class UpdateChecker
 			e.printStackTrace();
 		}
 		
+		/*
 		this.hasUpdate = true;
+		this.updateURL = "http://google.com";
+		this.updateVersion = "1.2.3";
+		*/
 	}
 	
-	public void check(String[] fileFormats) throws IOException, JSONException, NullPointerException
+	private void check(String[] fileFormats) throws IOException, JSONException, NullPointerException
 	{
 		JSONObject json;
 		json = readJsonFromUrl("http://widget.mcf.li/mc-mods/minecraft/"+CURSEID+".json");
 		
-		System.out.println(json.toString());
 		JSONObject files = json.getJSONObject("files");
 		JSONArray names = files.names();
 		
@@ -63,51 +70,103 @@ public class UpdateChecker
 			
 			String fileName = jobj.getString("name");
 			String url = jobj.getString("url");
+			String mcVersion = jobj.getString("version");
 			String type = jobj.getString("type");
 			
-			System.out.println(String.format("Filename: %s; Type: %s; URL: %s", fileName, type, url));
-			System.out.println("Matches: "+fileName.matches(".*-.*-.*\\.jar$"));
+			System.out.println(String.format("MCVersion: %s; Filename: %s; Type: %s; URL: %s", mcVersion, fileName, type, url));
 			
 			int index = fileName.lastIndexOf("-");
 			
 			if (index > -1) {
-				String version = getVersionFromFileName(getRegexFromFileFormats(fileFormats), fileName);
-				if (version.matches("(\\.*\\d+)+")) {
-					System.out.println("Version: "+version);
-					
-					if (this.checkVersion(version)) {
-						System.out.println("New version!");
-						this.versionsBehind++;
-						this.updateURL = url;
-						this.updateVersion = version.replaceAll("[^\\.0-9]", "");
+				int match = getRegexMatch(fileName, getRegexFromFileFormats(fileFormats));
+				if (match > -1) {
+					String version = getVersionFromFileName(fileFormats[match], fileName);
+					if (this.checkVersion(mcVersion, true)) {
+						if (version.matches("(\\.*\\d+)+")) {
+							System.out.println("Version: "+version);
+							
+							if (isAllowedType(type) && this.checkVersion(version, false)) {
+								System.out.println("New version!");
+								this.hasUpdate = true;
+								this.versionsBehind++;
+								this.updateURL = url;
+								this.updateVersion = version.replaceAll("[^\\.0-9]", "");
+							}
+						}
 					}
 				}
 			}
 		}
 	}
 	
-	public String getVersionFromFileName(String[] regex, String filename)
+	private boolean isAllowedType(String inp) {
+		return UpdateType.getTypeForStr(inp).toInt() <= MINTYPE.toInt();
+	}
+	
+	private String getVersionFromFileName(String pattern, String filename)
 	{
-		for (int i = 0; i < regex.length; i++) {
-			System.out.println("Regex["+i+"]: " + regex[i]);
+		boolean hasMCVer = pattern.contains("$mc");
+		
+		if (hasMCVer)
+		{
+			int mcVerIndex = pattern.indexOf("$mc");
+			
+			if (mcVerIndex > -1) {
+				boolean mcVerLeft = pattern.matches(".*\\$mc.*\\$v.*");
+				
+				String[] leftParts = pattern.substring(0, mcVerIndex).split("\\$v");
+				String[] rightParts = pattern.substring(mcVerIndex+3).split("\\$v");
+				
+				String left = leftParts[0];
+				String middle = (leftParts.length == 2 ? leftParts[1] : rightParts[0]);
+				String right = (rightParts.length == 2 ? rightParts[1] : rightParts[0]);
+				
+				String updateVersion = (mcVerLeft ? filename.substring(filename.indexOf(middle, left.length()) + middle.length(), filename.length() - right.length()) : filename.substring(left.length(), filename.indexOf(middle, left.length())));
+				
+				System.out.println("updateVersion: " + updateVersion);
+				
+				return updateVersion;
+			}
 		}
-		System.out.println("[^\\.0-9]");
+		else
+		{
+			int verIndex = pattern.indexOf("$v");
+			
+			if (verIndex > -1) {				
+				String left = pattern.substring(0, verIndex);
+				String right = pattern.substring(verIndex+2);
+				
+				String updateVersion = filename.substring(left.length(), filename.indexOf(right, left.length()));
+				
+				System.out.println("updateVersion: " + updateVersion);
+				
+				return updateVersion;
+			}
+		}
 		return "";
 	}
 	
-	public String[] getRegexFromFileFormats(String[] fileFormats)
+	private int getRegexMatch(String filename, String[] regex)
 	{
-		for (int i = 0; i < fileFormats.length; i++) {
-			fileFormats[i] = fileFormats[i].replaceAll("\\$n", ".*").replaceAll("\\$mc", "(\\\\d+\\\\.\\\\d\\\\.\\\\d)").replaceAll("\\$v", "(\\d+(\\\\.{1}\\\\d+)*)");
+		for (int i = 0; i < regex.length; i++) {
+			if (filename.matches(regex[i])) { return i; }
 		}
-		
-		return fileFormats;
+		return -1;
 	}
 	
-	public boolean checkVersion(String checkVer)
+	private String[] getRegexFromFileFormats(String[] fileFormats)
 	{
-		String[] currentVersion = this.MODVERSION.replaceAll("[^\\.0-9]", "").split("\\.");
-		System.out.println("v0.0.1".replaceAll("[^\\.0-9]", ""));
+		String[] output = new String[fileFormats.length];
+		for (int i = 0; i < fileFormats.length; i++) {
+			output[i] = fileFormats[i].replaceAll("\\$n", ".*").replaceAll("\\$mc", "(\\\\d+\\\\.\\\\d\\\\.\\\\d)").replaceAll("\\$v", "(\\\\d+(\\\\.{1}\\\\d+)*)");
+		}
+		
+		return output;
+	}
+	
+	private boolean checkVersion(String checkVer, boolean mc)
+	{
+		String[] currentVersion = (mc ? MinecraftForge.MC_VERSION : this.MODVERSION).replaceAll("[^\\.0-9]", "").split("\\.");
 		String[] newVersion = checkVer.replaceAll("[^\\.0-9]", "").split("\\.");
 		
 		while (currentVersion.length < newVersion.length) {
@@ -126,14 +185,10 @@ public class UpdateChecker
 			}
 		}
 		
-		System.out.println(concat(currentVersion, "."));
-		System.out.println(concat(newVersion, "."));
-		System.out.println();
-		
 		int currentVer = Integer.parseInt(concat(currentVersion).replaceAll("\\D", ""));
 		int newVer = Integer.parseInt(concat(newVersion).replaceAll("\\D", ""));
 		
-		return currentVer < newVer;
+		return mc ? (currentVer <= newVer) : (currentVer < newVer);
 	}
 	
 	private String readAll(Reader rd) throws IOException
@@ -146,7 +201,7 @@ public class UpdateChecker
 		return sb.toString();
 	}
 	
-	public JSONObject readJsonFromUrl(String url) throws IOException, JSONException
+	private JSONObject readJsonFromUrl(String url) throws IOException, JSONException
 	{
 		InputStream is = null;
 		
@@ -177,8 +232,6 @@ public class UpdateChecker
 		BETA("beta"),
 		ALPHA("release");
 		
-		//EnumChatFormatting //Reference
-		
 		private final String type;
 		
 		UpdateType(String releasetype) {
@@ -187,15 +240,35 @@ public class UpdateChecker
 		
 		public static UpdateType getTypeForInt(int i) {
 			switch (i) {
+			case 0:
+				return ALPHA;
 			case 1:
 				return BETA;
-			case 2:
+			default:
+				return RELEASE;
+			}
+		}
+		public static UpdateType getTypeForStr(String str) {
+			switch (str.toLowerCase()) {
+			case "beta":
+				return BETA;
+			case "alpha":
 				return ALPHA;
 			default:
 				return RELEASE;
 			}
 		}
 		
+		public int toInt() {
+			switch (type.toLowerCase()) {
+			case "alpha":
+				return 0;
+			case "beta":
+				return 1;
+			default:
+				return 2;
+			}
+		}
 		public String toString() {
 			return this.type;
 		}
