@@ -2,11 +2,12 @@ package com.tlf.forgeupdater.checker;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
 
 import com.tlf.forgeupdater.checker.UpdateChecker.UpdateType;
+import com.tlf.forgeupdater.common.ForgeUpdater;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
@@ -15,16 +16,20 @@ public class UpdateCheckManager
 {
 	public static final UpdateCheckManager INSTANCE = new UpdateCheckManager();
 	
-	private Set<UpdateChecker> checkers = new HashSet<UpdateChecker>();
-	private Set<UpdateChecker> checkersWithUpdate = new HashSet<UpdateChecker>();
+	public static boolean allowAll = true;
+	
+	private Map<String, UpdateChecker> checkers = new HashMap<String, UpdateChecker>();
+	private Map<String, UpdateChecker> checkersWithUpdate = new HashMap<String, UpdateChecker>();
 	
 	public void getUpdaters()
 	{
-		Iterator<ModContainer> iterator = Loader.instance().getActiveModList().iterator();
-		
-		while (iterator.hasNext())
-		{
-			this.checkClass(iterator.next());
+		if (allowAll) {
+			Iterator<ModContainer> iterator = Loader.instance().getActiveModList().iterator();
+			
+			while (iterator.hasNext())
+			{
+				this.checkClass(iterator.next());
+			}
 		}
 	}
 	
@@ -33,7 +38,6 @@ public class UpdateCheckManager
 		String name = mc.getName();
 		Object mod = mc.getMod();
 		Class clazz = mod == null ? null : mod.getClass();
-		
 		if (!name.equals("Minecraft Coder Pack") && !name.equals("Forge Mod Loader") && !name.equals("Minecraft Forge"))
 		{
 			Method[] methods = clazz.getMethods();
@@ -125,10 +129,15 @@ public class UpdateCheckManager
 					}
 				}
 				
-				try {
-					this.buildChecker(mc, id, minType, formats);
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
+				boolean allowed = ForgeUpdater.instance.config.get("mods", mc.getModId(), true).getBoolean(true);
+				ForgeUpdater.instance.config.save();
+				
+				if (allowed) {
+					try {
+						this.buildChecker(mc, id, minType, formats);
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
@@ -141,13 +150,13 @@ public class UpdateCheckManager
 		} else {
 			System.out.println("====== Building checker for " + mc.getName());
 			UpdateChecker checker = new UpdateChecker(mc, curseID, minType, fileFormats);
-			this.checkers.add(checker);
+			this.checkers.put(mc.getModId(), checker);
 			if (checker.hasUpdate) {
-				this.checkersWithUpdate.add(checker);
+				this.checkersWithUpdate.put(mc.getModId(), checker);
 			}
 		}
 	}
 	
-	public Set<UpdateChecker> getCheckers() { return this.checkers; }
-	public Set<UpdateChecker> getCheckersWithUpdate() { return this.checkersWithUpdate; }
+	public Map<String, UpdateChecker> getCheckers() { return this.checkers; }
+	public Map<String, UpdateChecker> getCheckersWithUpdate() { return this.checkersWithUpdate; }
 }
