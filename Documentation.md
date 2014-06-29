@@ -60,3 +60,5 @@ public int minType() {
   return 2;
 }
 ```
+
+If you have any questions, bug reports, or feature requests, *please* create an issue. I would love to get feedback.
