@@ -81,16 +81,19 @@ public class UpdateChecker
 				int match = getRegexMatch(fileName, getRegexFromFileFormats(fileFormats));
 				if (match > -1) {
 					String version = getVersionFromFileName(fileFormats[match], fileName);
-					if (this.checkVersion(mcVersion, true)) {
+					if (this.checkVersion(MinecraftForge.MC_VERSION, mcVersion, false)) {
 						if (version.matches("(\\.*\\d+)+")) {
 							System.out.println("Version: "+version);
 							
-							if (isAllowedType(type) && this.checkVersion(version, false)) {
+							if (isAllowedType(type) && this.checkVersion(this.MODVERSION, version, true)) {
 								System.out.println("New version!");
 								this.hasUpdate = true;
 								this.versionsBehind++;
-								this.updateURL = url;
-								this.updateVersion = version.replaceAll("[^\\.0-9]", "");
+								if (this.checkVersion(this.updateVersion, version, true)) {
+									System.out.println(version + " > " + this.updateVersion);
+									this.updateURL = url;
+									this.updateVersion = version.replaceAll("[^\\.0-9]", "");
+								}
 							}
 						}
 					}
@@ -164,10 +167,16 @@ public class UpdateChecker
 		return output;
 	}
 	
-	private boolean checkVersion(String checkVer, boolean mc)
+	private boolean checkVersion(String current, String check, boolean strict)
 	{
-		String[] currentVersion = (mc ? MinecraftForge.MC_VERSION : this.MODVERSION).replaceAll("[^\\.0-9]", "").split("\\.");
-		String[] newVersion = checkVer.replaceAll("[^\\.0-9]", "").split("\\.");
+		if (current == null || current.equals("")) {
+			return true;
+		} else if (check == null || check.equals("")) {
+			return false;
+		}
+		
+		String[] currentVersion = current.replaceAll("[^\\.0-9]", "").split("\\.");
+		String[] newVersion = check.replaceAll("[^\\.0-9]", "").split("\\.");
 		
 		while (currentVersion.length < newVersion.length) {
 			currentVersion = append(currentVersion, "0");
@@ -188,7 +197,7 @@ public class UpdateChecker
 		int currentVer = Integer.parseInt(concat(currentVersion).replaceAll("\\D", ""));
 		int newVer = Integer.parseInt(concat(newVersion).replaceAll("\\D", ""));
 		
-		return mc ? (currentVer <= newVer) : (currentVer < newVer);
+		return strict ? (currentVer < newVer) : (currentVer <= newVer);
 	}
 	
 	private String readAll(Reader rd) throws IOException
