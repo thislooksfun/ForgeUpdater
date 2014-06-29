@@ -22,7 +22,8 @@ public String curseID() {
 ```
 
 
-**Optional, but reccomended:** The file format to use for this mod, where $mc = minecraft version; $v = mod version. **Example:** this mod is `Forge_Updater-$mc-$v.jar`  
+**Optional, but reccomended:** The file format to use for this mod, where $mc = minecraft version; $v = mod version.  
+**Example:** this mod is `Forge_Updater-$mc-$v.jar`  
 **Note 1:** All spaces in the resulting string will be replaced with underscores  
 **Note 2:** The `$mc` section is optional, but `$v` is required  
 **Note 3:** If not found, the file pattern defaults to the pattern `[name]-$mc-$v.(jar|zip)` where `[name]` is your mod name with all spaces replaced with underscores (_)
