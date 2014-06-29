@@ -23,7 +23,7 @@ public String curseID() {
 }
 ```
 
-
+---
 **Optional, but reccomended:** The file format to use for this mod, where $mc = minecraft version; $v = mod version.  
 **Example:** This mod is `Forge_Updater-$mc-$v.jar`  
 **Note 1:** All spaces in the resulting string will be replaced with underscores  
@@ -37,7 +37,7 @@ public String fileFormat() {
 }
 ```
 
-
+---
 **Optional, but reccomended:** The file formats to use for this mod, if it has more than one. See the previous method.  
 **Example:** My mod (Hide Names)[http://minecraft.curseforge.com/mc-mods/62786-hide-names] returns `new String[]{"Hide_Names-$mc-$v.jar", "HideNames_v$v_MC_$mc.jar"}`  
 **Note 1:** *If this method is present, any result from the `fileFormat()` method will be ignored.*  
@@ -51,7 +51,7 @@ public String[] fileFormats() {
 }
 ```
 
-
+---
 **Optional:** The minimum release type to be checked for. 0 = alpha; 1 = beta; 2 = release.  
 **Example:** Returning 1 will allow beta and release builds, but not alpha builds.
 **Note 1:** By default this will be `2`
