@@ -33,6 +33,21 @@ public class UpdateCheckManager
 		}
 	}
 	
+	public int refresh()
+	{
+		this.checkers = new HashMap<String, UpdateChecker>();
+		this.checkersWithUpdate = new HashMap<String, UpdateChecker>();
+		
+		Iterator<ModContainer> iterator = Loader.instance().getActiveModList().iterator();
+		
+		while (iterator.hasNext())
+		{
+			this.checkClass(iterator.next());
+		}
+		
+		return this.checkersWithUpdate.size();
+	}
+	
 	private void checkClass(ModContainer mc)
 	{
 		String name = mc.getName();
@@ -131,6 +146,10 @@ public class UpdateCheckManager
 				
 				boolean allowed = ForgeUpdater.instance.config.get("mods", mc.getModId(), true).getBoolean(true);
 				ForgeUpdater.instance.config.save();
+				
+				for (int i = 0; i < formats.length; i++) {
+					formats[i] = formats[i].replace(" ", "_");
+				}
 				
 				if (allowed) {
 					try {

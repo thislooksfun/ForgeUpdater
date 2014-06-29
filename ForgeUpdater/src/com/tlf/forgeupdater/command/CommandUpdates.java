@@ -2,9 +2,7 @@ package com.tlf.forgeupdater.command;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
@@ -59,6 +57,16 @@ public class CommandUpdates extends CommandBase
 				page = parseIntBounded(sender, args[0], 1, pages)-1;
 			} else if (args[0].equalsIgnoreCase("info")) {
 				throw new WrongUsageException("/updates info [modid]", new Object[0]);
+			} else if (args[0].equalsIgnoreCase("refresh")) {
+				int updates = UpdateCheckManager.INSTANCE.refresh();
+				
+				String msg = "There "+(updates == 1 ? "is " : "are ")+EnumChatFormatting.RED+updates+EnumChatFormatting.AQUA+" mod"+(updates == 1 ? "" : "s")+" with"+(updates == 1 ? " a" : "")+" new version"+(updates == 1 ? "" : "s")+".";
+				sender.addChatMessage(new ChatComponentText(msg).setChatStyle(new ChatStyle().setColor(EnumChatFormatting.AQUA)));
+				
+				IChatComponent chatComponentBody = new ChatComponentText("For more information, please type ").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.AQUA));
+				IChatComponent chatComponentLink = new ChatComponentText("/updates").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED).setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/updates")).setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Run command").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.GOLD)))));;
+				sender.addChatMessage(chatComponentBody.appendSibling(chatComponentLink));
+				return;
 			} else {
 				throw new WrongUsageException(this.getCommandUsage(sender), new Object[0]);
 			}
@@ -78,6 +86,11 @@ public class CommandUpdates extends CommandBase
 			chatComponentLink.setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED).setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, checker.updateURL())).setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Download version "+EnumChatFormatting.RED+checker.updateVersion()).setChatStyle(new ChatStyle().setColor(EnumChatFormatting.AQUA)))));
 			chatComponentBody.setChatStyle(new ChatStyle().setColor(EnumChatFormatting.AQUA)).appendSibling(chatComponentLink);
 			sender.addChatMessage(chatComponentBody);
+		} else if (pages == 0) {
+			IChatComponent left = new ChatComponentText("There are no updates at this time. Use ").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.DARK_GREEN));
+			IChatComponent middle = new ChatComponentText("/updates refresh").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED).setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/updates refresh")).setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Run command").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.GOLD)))));
+			IChatComponent right = new ChatComponentText(" to refresh").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.DARK_GREEN).setChatClickEvent(new ClickEvent(null, null)).setChatHoverEvent(new HoverEvent(null, null)));
+			sender.addChatMessage(left.appendSibling(middle).appendSibling(right));
 		} else {
 			int pageStart = page*7;
 			int pageEnd = ((page*7)+7 > map.size()) ? map.size() : (page*7)+7;
@@ -92,7 +105,7 @@ public class CommandUpdates extends CommandBase
 				UpdateChecker checker = checkers[i];
 				
 				ChatComponentText chatComponent = new ChatComponentText("- "+EnumChatFormatting.RED+checker.MODID+EnumChatFormatting.AQUA+" is "+EnumChatFormatting.RED+checker.versionsBehind()+EnumChatFormatting.AQUA+" version"+(checker.versionsBehind() == 1 ? "" : "s")+" behind");
-				chatComponent.setChatStyle(new ChatStyle().setColor(EnumChatFormatting.AQUA).setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/updates info "+checker.MODID)).setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("/updates info "+checker.MODID).setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)))));
+				chatComponent.setChatStyle(new ChatStyle().setColor(EnumChatFormatting.AQUA).setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/updates info "+checker.MODID)).setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Show information").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)))));
 				sender.addChatMessage(chatComponent);
 			}
 		}
@@ -103,11 +116,12 @@ public class CommandUpdates extends CommandBase
 	{
 		if (par2ArrayOfStr.length == 1) {
 			int pages = (int)Math.ceil((double)UpdateCheckManager.INSTANCE.getCheckersWithUpdate().size()/4.0D);
-			String[] matches = new String[pages+1];
+			String[] matches = new String[pages+2];
 			for (int i = 0; i < pages; i++) {
 				matches[i] = ""+(i+1);
 			}
 			matches[pages] = "info";
+			matches[pages+1] = "refresh";
 			
 			return getListOfStringsMatchingLastWord(par2ArrayOfStr, matches);
 		} else if (par2ArrayOfStr.length == 2 && par2ArrayOfStr[0].equalsIgnoreCase("info")) {
