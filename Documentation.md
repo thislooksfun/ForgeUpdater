@@ -4,7 +4,7 @@ End-users:
 `/updates` - lists all mods with new versions  
 `/updates [page]` - the page of mods to view  
 `/updates info [mod]` - view more info about one of the mods with a pending update  
-`/updates refresh` - coming in 1.1
+`/updates refresh` - (not in 1.0.0) checks for new updates
 
 Modders:
 ===
