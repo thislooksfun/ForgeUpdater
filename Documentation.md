@@ -8,7 +8,7 @@ End-users:
 
 Modders:
 ===
-I tried to make this as easy to implement as possible, and I think I did a pretty good job. All you have to do is add the following to your main mod class. (The one with @Mod). These can be in any order you want, just make sure they have the same name and return types otherwise it will not work! If you don't know what the `@Optional.Method` annotation does, Minalien has a great page about it [here](http://minalien.com/minecraft-forge-feature-spotlight-optional-annotation/).
+I tried to make this as easy to implement as possible, and I think I did a pretty good job. You don't have to add any dependencies to your mod(s), and you don't have to worry about anything crashing if this isn't installed. All you have to do is add the following methods to your main mod class (the one with @Mod). That's it. These can be in any order you want, just make sure they have the same name and return types otherwise it will not work! If you don't know what the `@Optional.Method` annotation does, Minalien has a great page about it [here](http://minalien.com/minecraft-forge-feature-spotlight-optional-annotation/).
 
 
 **Required:** The `CurseID` for your mod. Find it at `curse.com/mc-mods/minecraft/[curseID]`  
@@ -38,8 +38,8 @@ public String fileFormat() {
 
 **Optional, but reccomended:** The file formats to use for this mod, if it has more than one. See the previous method.  
 **Example:** My mod (Hide Names)[http://minecraft.curseforge.com/mc-mods/62786-hide-names] returns `new String[]{"Hide_Names-$mc-$v.jar", "HideNames_v$v_MC_$mc.jar"}`  
-**Note 1:** This must be in the order they should be checked.  
-**Note 2:** If this method is present, any result from the `fileFormat()` method will be ignored.  
+**Note 1:** *If this method is present, any result from the `fileFormat()` method will be ignored.*  
+**Note 2:** This must be in the order they should be checked.  
 **Note 3:** If not found, it will use the result from `fileFormat()` instead. If neither are found, it defaults to the pattern `[name]-$mc-$v.(jar|zip)` where `[name]` is your mod name with all spaces replaced with underscores (_)  
 
 ```java
