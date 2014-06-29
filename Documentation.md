@@ -15,7 +15,8 @@ The methods
 ---
 ---
 **Required:** The `CurseID` for your mod. Find it at `curse.com/mc-mods/minecraft/[curseID]`  
-For example: this mod is at `curse/com/mc-mods/minecraft/forgeupdater`, therefore the curseID is `forgeupdater`
+**Example:** This mod is at `curse/com/mc-mods/minecraft/forgeupdater`, therefore the curseID is `forgeupdater`  
+**Note:** This is the same code as you would use for the [mod] tag on the [MinecraftForums](http://minecraftforum.net)
 
 ```java
 @Optional.Method(modid = "forgeupdater")
