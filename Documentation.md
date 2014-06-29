@@ -23,14 +23,14 @@ public String curseID() {
 
 
 **Optional, but reccomended:** The file format to use for this mod, where $mc = minecraft version; $v = mod version. Example: this mod is "Forge_Updater-$mc-$v.jar"  
-**Note 1:** all spaces in the resulting string will be replaced with underscores  
-**Note 2:** the `$mc` section is optional, but `$v` is required  
-**Note 3:** if not found, the file pattern defaults to `[name]-$mc-$v.(jar|zip)` where `[name]` is your mod name with all spaces replaced with underscores (_)
+**Note 1:** All spaces in the resulting string will be replaced with underscores  
+**Note 2:** The `$mc` section is optional, but `$v` is required  
+**Note 3:** If not found, the file pattern defaults to the pattern `[name]-$mc-$v.(jar|zip)` where `[name]` is your mod name with all spaces replaced with underscores (_)
 
 ```java
 @Optional.Method(modid = "forgeupdater")
 public String fileFormat() {
-  return "Forge_Updater-$mc-$v.jar";
+  return [filepattern];
 }
 ```
 
@@ -38,20 +38,22 @@ public String fileFormat() {
 **Optional, but reccomended:** The file formats to use for this mod, if it has more than one. See the previous method.  
 **Note 1:** This must be in the order they should be checked.  
 **Note 2:** If this method is present, any result from the `fileFormat()` method will be ignored.
+**Note 3:** If not found, it will use the result from `fileFormat()` instead. If neither are found, it defaults to the pattern `[name]-$mc-$v.(jar|zip)` where `[name]` is your mod name with all spaces replaced with underscores (_)  
 
 ```java
 @Optional.Method(modid = "forgeupdater")
 public String[] fileFormats() {
-  return new String[]{"Forge_Updater-$mc-$v.jar"};
+  return new String[]{[filepattern 1], [filepattern 2] ... [filepattern X]};
 }
 ```
 
 
-**Optional:** The minimum release type to be checked for. 0 = release; 1 = beta; 2 = alpha. Example: 1 will allow beta and release builds, but not alpha.
+**Optional:** The minimum release type to be checked for. 0 = alpha; 1 = beta; 2 = release. Example: 1 will allow beta and release builds, but not alpha builds.
+**Note 1:** By default this will be `2`
 
 ```java
 @Optional.Method(modid = "forgeupdater")
 public int minType() {
-  return 0;
+  return 2;
 }
 ```
