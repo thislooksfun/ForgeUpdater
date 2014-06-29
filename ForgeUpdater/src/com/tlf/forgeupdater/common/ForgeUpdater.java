@@ -23,7 +23,7 @@ public class ForgeUpdater
 {
 	public static final String MODID = "forgeupdater";
 	public static final String NAME = "Forge Updater";
-	public static final String VERSION = "1.0.0";
+	public static final String VERSION = "1.1.0";
 	
 	/** The {@link Configuration} for Hide Names */
 	public Configuration config;
@@ -58,19 +58,19 @@ public class ForgeUpdater
 		event.registerServerCommand(new CommandUpdates());
 	}
 	
-	/** The CurseID for your mod. Find it at curse.com/mc-mods/minecraft/[curseID ]*/
+	/** The CurseID for your mod. Find it at curse.com/mc-mods/minecraft/[curseID] For example: this mod is at curse/com/mc-mods/minecraft/221832-forgeupdater, therefore the curseID is 221832-forgeupdater */
 	@Optional.Method(modid = "forgeupdater")
-	public String curseID() { return ""; }
+	public String curseID() { return "221832-forgeupdater"; }
 	
-	/** The file formats to use for this mod, where $mc = minecraft version; $v = mod version. Example: "Hide_Names-$mc-$v.jar" */
+	/** The file format to use for this mod, where $mc = minecraft version; $v = mod version. Example: this mod is "Forge_Updater-$mc-$v.jar" Note: all spaces in the resulting string will be replaced with underscores */
 	@Optional.Method(modid = "forgeupdater")
-	public String fileFormat() { return ""; }
+	public String fileFormat() { return "Forge_Updater-$mc-$v.jar"; }
 	
 	/** The file formats to use for this mod. See {@link #fileFormat()} */
 	@Optional.Method(modid = "forgeupdater")
-	public String[] fileFormats() { return new String[]{""}; }
+	public String[] fileFormats() { return new String[]{"Forge_Updater-$mc-$v.jar"}; }
 	
-	/** The minimum release type to be checked for. 0 = release; 1 = beta; 2 = alpha. Example: 1 will allow beta and release builds, but not alpha. */
+	/** The minimum release type to be checked for. 0 = alpha; 1 = beta; 2 = release. Example: 1 will allow beta and release builds, but not alpha builds. */
 	@Optional.Method(modid = "forgeupdater")
 	public int minType() { return 0; }
 }

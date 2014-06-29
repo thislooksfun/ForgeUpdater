@@ -1,4 +1,8 @@
 ForgeUpdater changelog:
 
+1.1:
+* Added /updates refresh command
+* Fixed bug where the newest version isn't the one displayed in-game if the updates weren't in the expected order
+
 1.0.0:
 * Initial release!
