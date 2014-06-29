@@ -13,6 +13,7 @@ If you don't know what the `@Optional.Method` annotation does, Minalien has a gr
 
 The methods
 ---
+---
 **Required:** The `CurseID` for your mod. Find it at `curse.com/mc-mods/minecraft/[curseID]`  
 For example: this mod is at `curse/com/mc-mods/minecraft/forgeupdater`, therefore the curseID is `forgeupdater`
 
@@ -63,4 +64,5 @@ public int minType() {
 }
 ```
 
+---
 If you have any questions, bug reports, or feature requests, *please* create an issue. I would love to get feedback.
