@@ -8,9 +8,11 @@ End-users:
 
 Modders:
 ===
-I tried to make this as easy to implement as possible, and I think I did a pretty good job. You don't have to add any dependencies to your mod(s), and you don't have to worry about anything crashing if this isn't installed. All you have to do is add the following methods to your main mod class (the one with @Mod). That's it. These can be in any order you want, just make sure they have the same name and return types otherwise it will not work! If you don't know what the `@Optional.Method` annotation does, Minalien has a great page about it [here](http://minalien.com/minecraft-forge-feature-spotlight-optional-annotation/).
+I tried to make this as easy to implement as possible, and I think I did a pretty good job. You don't have to add any dependencies to your mod(s), and you don't have to worry about anything crashing if this isn't installed. All you have to do is add the following methods to your main mod class (the one with @Mod). That's it. These can be in any order you want, just make sure they have the same name and return types otherwise it will not work!  
+If you don't know what the `@Optional.Method` annotation does, Minalien has a great page about it [here](http://minalien.com/minecraft-forge-feature-spotlight-optional-annotation/).
 
-
+The methods
+---
 **Required:** The `CurseID` for your mod. Find it at `curse.com/mc-mods/minecraft/[curseID]`  
 For example: this mod is at `curse/com/mc-mods/minecraft/forgeupdater`, therefore the curseID is `forgeupdater`
 
