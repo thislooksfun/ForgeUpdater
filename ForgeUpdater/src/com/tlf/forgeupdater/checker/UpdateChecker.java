@@ -258,23 +258,21 @@ public class UpdateChecker
 			}
 		}
 		public static UpdateType getTypeForStr(String str) {
-			switch (str.toLowerCase()) {
-			case "beta":
+			if (str.equalsIgnoreCase("beta")) {
 				return BETA;
-			case "alpha":
+			} else if (str.equalsIgnoreCase("alpha")) {
 				return ALPHA;
-			default:
+			} else {
 				return RELEASE;
 			}
 		}
 		
 		public int toInt() {
-			switch (type.toLowerCase()) {
-			case "alpha":
+			if (this.type.equalsIgnoreCase("beta")) {
 				return 0;
-			case "beta":
+			} else if (this.type.equalsIgnoreCase("alpha")) {
 				return 1;
-			default:
+			} else {
 				return 2;
 			}
 		}

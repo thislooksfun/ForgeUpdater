@@ -131,7 +131,7 @@ public class UpdateCheckManager
 				
 				if (updateTypes != null) {
 					try {
-						minType = UpdateType.getTypeForInt((int)updateTypes.invoke(mod));
+						minType = UpdateType.getTypeForInt((Integer)updateTypes.invoke(mod));
 					} catch (IllegalAccessException e) {
 						e.printStackTrace();
 						return;
