@@ -53,7 +53,7 @@ public class UpdateChecker
 		this.hasUpdate = true;
 		this.updateURL = "http://google.com";
 		this.updateVersion = "1.2.3";
-		*/
+		 */
 	}
 	
 	private void check(String[] fileFormats) throws IOException, JSONException, NullPointerException
@@ -73,8 +73,6 @@ public class UpdateChecker
 			String mcVersion = jobj.getString("version");
 			String type = jobj.getString("type");
 			
-			System.out.println(String.format("MCVersion: %s; Filename: %s; Type: %s; URL: %s", mcVersion, fileName, type, url));
-			
 			int index = fileName.lastIndexOf("-");
 			
 			if (index > -1) {
@@ -82,15 +80,11 @@ public class UpdateChecker
 				if (match > -1) {
 					String version = getVersionFromFileName(fileFormats[match], fileName);
 					if (this.checkVersion(MinecraftForge.MC_VERSION, mcVersion, false)) {
-						if (version.matches("(\\.*\\d+)+")) {
-							System.out.println("Version: "+version);
-							
+						if (version.matches("(\\.*\\d+)+")) {							
 							if (isAllowedType(type) && this.checkVersion(this.MODVERSION, version, true)) {
-								System.out.println("New version!");
 								this.hasUpdate = true;
 								this.versionsBehind++;
 								if (this.checkVersion(this.updateVersion, version, true)) {
-									System.out.println(version + " > " + this.updateVersion);
 									this.updateURL = url;
 									this.updateVersion = version.replaceAll("[^\\.0-9]", "");
 								}
@@ -125,9 +119,7 @@ public class UpdateChecker
 				String right = (rightParts.length == 2 ? rightParts[1] : rightParts[0]);
 				
 				String updateVersion = (mcVerLeft ? filename.substring(filename.indexOf(middle, left.length()) + middle.length(), filename.length() - right.length()) : filename.substring(left.length(), filename.indexOf(middle, left.length())));
-				
-				System.out.println("updateVersion: " + updateVersion);
-				
+								
 				return updateVersion;
 			}
 		}
@@ -140,9 +132,7 @@ public class UpdateChecker
 				String right = pattern.substring(verIndex+2);
 				
 				String updateVersion = filename.substring(left.length(), filename.indexOf(right, left.length()));
-				
-				System.out.println("updateVersion: " + updateVersion);
-				
+								
 				return updateVersion;
 			}
 		}

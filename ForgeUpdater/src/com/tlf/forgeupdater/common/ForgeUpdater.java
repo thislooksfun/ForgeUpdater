@@ -23,7 +23,7 @@ public class ForgeUpdater
 {
 	public static final String MODID = "forgeupdater";
 	public static final String NAME = "Forge Updater";
-	public static final String VERSION = "1.1.0";
+	public static final String VERSION = "1.2.0";
 	
 	/** The {@link Configuration} for Hide Names */
 	public Configuration config;

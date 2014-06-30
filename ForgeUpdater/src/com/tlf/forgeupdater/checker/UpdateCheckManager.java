@@ -52,9 +52,14 @@ public class UpdateCheckManager
 	{
 		String name = mc.getName();
 		Object mod = mc.getMod();
-		Class clazz = mod == null ? null : mod.getClass();
+		Class clazz = (mod == null ? null : mod.getClass());
 		if (!name.equals("Minecraft Coder Pack") && !name.equals("Forge Mod Loader") && !name.equals("Minecraft Forge"))
 		{
+			if (clazz == null) {
+				System.err.println("Class of "+name+" is null!");
+				return;
+			}
+			
 			Method[] methods = clazz.getMethods();
 			
 			Method curseID = null;
@@ -167,7 +172,6 @@ public class UpdateCheckManager
 		if (curseID.equals("")) {
 			throw new IllegalArgumentException("curseID can't be empty!");
 		} else {
-			System.out.println("====== Building checker for " + mc.getName());
 			UpdateChecker checker = new UpdateChecker(mc, curseID, minType, fileFormats);
 			this.checkers.put(mc.getModId(), checker);
 			if (checker.hasUpdate) {
