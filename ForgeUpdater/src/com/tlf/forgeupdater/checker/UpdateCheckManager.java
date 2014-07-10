@@ -1,5 +1,8 @@
 package com.tlf.forgeupdater.checker;
 
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -9,31 +12,49 @@ import java.util.Map;
 import com.tlf.forgeupdater.checker.UpdateChecker.UpdateType;
 import com.tlf.forgeupdater.common.ForgeUpdater;
 
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.ModContainer;
-
-public class UpdateCheckManager
+public class UpdateCheckManager implements Runnable
 {
-	public static final UpdateCheckManager INSTANCE = new UpdateCheckManager();
-	
 	public static boolean allowAll = true;
 	
 	private Map<String, UpdateChecker> checkers = new HashMap<String, UpdateChecker>();
 	private Map<String, UpdateChecker> checkersWithUpdate = new HashMap<String, UpdateChecker>();
 	
-	public void getUpdaters()
+	private static boolean initialized = false;
+	
+	private int percentDone = 0;
+	
+	@Override
+	public void run()
+	{
+		if (initialized) {
+			this.refresh();
+		} else {
+			this.getUpdaters();
+		}
+		
+		UpdateCheckThreadController.instance.checking = false;
+		UpdateCheckThreadController.instance.finishCheck(this.checkersWithUpdate.size());
+	}
+	
+	private void getUpdaters()
 	{
 		if (allowAll) {
 			Iterator<ModContainer> iterator = Loader.instance().getActiveModList().iterator();
+			int max = Loader.instance().getActiveModList().size();
+			int current = 0;
 			
 			while (iterator.hasNext())
 			{
-				this.checkClass(iterator.next());
+				ModContainer mc = iterator.next();
+				System.out.println("Checking "+mc.getName()+"...");
+				this.checkClass(mc);
+				System.out.println("Done!");
+				this.percentDone = (int)(((float)++current/(float)max)*100);
 			}
 		}
 	}
 	
-	public int refresh()
+	private void refresh()
 	{
 		this.checkers = new HashMap<String, UpdateChecker>();
 		this.checkersWithUpdate = new HashMap<String, UpdateChecker>();
@@ -44,8 +65,6 @@ public class UpdateCheckManager
 		{
 			this.checkClass(iterator.next());
 		}
-		
-		return this.checkersWithUpdate.size();
 	}
 	
 	private void checkClass(ModContainer mc)
@@ -158,6 +177,7 @@ public class UpdateCheckManager
 				
 				if (allowed) {
 					try {
+						System.out.println("Building checker for " + name);
 						this.buildChecker(mc, id, minType, formats);
 					} catch (IllegalArgumentException e) {
 						e.printStackTrace();
@@ -180,6 +200,10 @@ public class UpdateCheckManager
 		}
 	}
 	
-	public Map<String, UpdateChecker> getCheckers() { return this.checkers; }
-	public Map<String, UpdateChecker> getCheckersWithUpdate() { return this.checkersWithUpdate; }
+	public synchronized Map<String, UpdateChecker> getCheckers() { return this.checkers; }
+	public synchronized Map<String, UpdateChecker> getCheckersWithUpdate() { return this.checkersWithUpdate; }
+	
+	public synchronized int percentDone() {
+		return this.percentDone;
+	}
 }

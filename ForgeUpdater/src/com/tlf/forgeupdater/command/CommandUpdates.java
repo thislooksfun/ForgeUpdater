@@ -1,8 +1,5 @@
 package com.tlf.forgeupdater.command;
 
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
@@ -14,7 +11,10 @@ import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 
-import com.tlf.forgeupdater.checker.UpdateCheckManager;
+import java.util.List;
+import java.util.Map;
+
+import com.tlf.forgeupdater.checker.UpdateCheckThreadController;
 import com.tlf.forgeupdater.checker.UpdateChecker;
 
 public class CommandUpdates extends CommandBase
@@ -34,7 +34,7 @@ public class CommandUpdates extends CommandBase
 	@Override
 	public String getCommandUsage(ICommandSender par1ICommandSender)
 	{
-		return "/updates <page|info>";
+		return "/updates <page|info|refresh>";
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public class CommandUpdates extends CommandBase
 	@Override
 	public void processCommand(ICommandSender sender, String[] args)
 	{
-		Map<String, UpdateChecker> map = UpdateCheckManager.INSTANCE.getCheckersWithUpdate();
+		Map<String, UpdateChecker> map = UpdateCheckThreadController.instance.MANAGER.getCheckersWithUpdate();
 		UpdateChecker[] checkers = map.values().toArray(new UpdateChecker[0]);
 		
 		int pages = (int)Math.ceil((double)map.size()/4.0D);
@@ -58,14 +58,7 @@ public class CommandUpdates extends CommandBase
 			} else if (args[0].equalsIgnoreCase("info")) {
 				throw new WrongUsageException("/updates info [modid]", new Object[0]);
 			} else if (args[0].equalsIgnoreCase("refresh")) {
-				int updates = UpdateCheckManager.INSTANCE.refresh();
-				
-				String msg = "There "+(updates == 1 ? "is " : "are ")+EnumChatFormatting.RED+updates+EnumChatFormatting.AQUA+" mod"+(updates == 1 ? "" : "s")+" with"+(updates == 1 ? " a" : "")+" new version"+(updates == 1 ? "" : "s")+".";
-				sender.addChatMessage(new ChatComponentText(msg).setChatStyle(new ChatStyle().setColor(EnumChatFormatting.AQUA)));
-				
-				IChatComponent chatComponentBody = new ChatComponentText("For more information, please type ").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.AQUA));
-				IChatComponent chatComponentLink = new ChatComponentText("/updates").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED).setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/updates")).setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Run command").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.GOLD)))));;
-				sender.addChatMessage(chatComponentBody.appendSibling(chatComponentLink));
+				UpdateCheckThreadController.instance.refresh(sender);
 				return;
 			} else {
 				throw new WrongUsageException(this.getCommandUsage(sender), new Object[0]);
@@ -87,10 +80,15 @@ public class CommandUpdates extends CommandBase
 			chatComponentBody.setChatStyle(new ChatStyle().setColor(EnumChatFormatting.AQUA)).appendSibling(chatComponentLink);
 			sender.addChatMessage(chatComponentBody);
 		} else if (pages == 0) {
-			IChatComponent left = new ChatComponentText("There are no updates at this time. Use ").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.DARK_GREEN));
-			IChatComponent middle = new ChatComponentText("/updates refresh").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED).setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/updates refresh")).setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Run command").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.GOLD)))));
-			IChatComponent right = new ChatComponentText(" to refresh").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.DARK_GREEN).setChatClickEvent(new ClickEvent(null, null)).setChatHoverEvent(new HoverEvent(null, null)));
-			sender.addChatMessage(left.appendSibling(middle).appendSibling(right));
+			if (UpdateCheckThreadController.instance.checking()) {
+				int percent = UpdateCheckThreadController.instance.MANAGER.percentDone();
+				sender.addChatMessage(new ChatComponentText("There are no known updates, but there is currently a check "+percent+"% done!").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.DARK_GREEN)));
+			} else {
+				IChatComponent left = new ChatComponentText("There are no updates at this time. Use ").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.DARK_GREEN));
+				IChatComponent middle = new ChatComponentText("/updates refresh").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED).setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/updates refresh")).setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Run command").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.GOLD)))));
+				IChatComponent right = new ChatComponentText(" to refresh").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.DARK_GREEN).setChatClickEvent(new ClickEvent(null, null)).setChatHoverEvent(new HoverEvent(null, null)));
+				sender.addChatMessage(left.appendSibling(middle).appendSibling(right));
+			}
 		} else {
 			int pageStart = page*7;
 			int pageEnd = ((page*7)+7 > map.size()) ? map.size() : (page*7)+7;
@@ -115,7 +113,7 @@ public class CommandUpdates extends CommandBase
 	public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr)
 	{
 		if (par2ArrayOfStr.length == 1) {
-			int pages = (int)Math.ceil((double)UpdateCheckManager.INSTANCE.getCheckersWithUpdate().size()/4.0D);
+			int pages = (int)Math.ceil((double)UpdateCheckThreadController.instance.getUpdates()/4.0D);
 			String[] matches = new String[pages+2];
 			for (int i = 0; i < pages; i++) {
 				matches[i] = ""+(i+1);
@@ -125,7 +123,7 @@ public class CommandUpdates extends CommandBase
 			
 			return getListOfStringsMatchingLastWord(par2ArrayOfStr, matches);
 		} else if (par2ArrayOfStr.length == 2 && par2ArrayOfStr[0].equalsIgnoreCase("info")) {
-			String[] mods = UpdateCheckManager.INSTANCE.getCheckersWithUpdate().keySet().toArray(new String[0]);
+			String[] mods = UpdateCheckThreadController.instance.MANAGER.getCheckersWithUpdate().keySet().toArray(new String[0]);
 			
 			return getListOfStringsMatchingLastWord(par2ArrayOfStr, mods);
 		}

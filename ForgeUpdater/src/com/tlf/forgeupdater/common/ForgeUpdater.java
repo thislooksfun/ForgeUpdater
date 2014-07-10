@@ -5,6 +5,7 @@ import java.io.File;
 import net.minecraftforge.common.config.Configuration;
 
 import com.tlf.forgeupdater.checker.UpdateCheckManager;
+import com.tlf.forgeupdater.checker.UpdateCheckThreadController;
 import com.tlf.forgeupdater.command.CommandUpdates;
 import com.tlf.forgeupdater.event.EventHandlerCPW;
 
@@ -51,7 +52,7 @@ public class ForgeUpdater
 	}
 	@EventHandler
 	public void onPostInit(FMLPostInitializationEvent event) {
-		UpdateCheckManager.INSTANCE.getUpdaters();
+		UpdateCheckThreadController.instance.check();
 	}
 	@EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
