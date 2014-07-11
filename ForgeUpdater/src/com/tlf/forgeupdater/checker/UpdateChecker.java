@@ -1,5 +1,9 @@
 package com.tlf.forgeupdater.checker;
 
+import net.minecraftforge.common.MinecraftForge;
+
+import cpw.mods.fml.common.ModContainer;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,13 +14,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import net.minecraftforge.common.MinecraftForge;
-
 import com.tlf.forgeupdater.JSON.JSONArray;
 import com.tlf.forgeupdater.JSON.JSONException;
 import com.tlf.forgeupdater.JSON.JSONObject;
-
-import cpw.mods.fml.common.ModContainer;
 
 public class UpdateChecker
 {
@@ -48,12 +48,6 @@ public class UpdateChecker
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
-		
-		/*
-		this.hasUpdate = true;
-		this.updateURL = "http://google.com";
-		this.updateVersion = "1.2.3";
-		 */
 	}
 	
 	private void check(String[] fileFormats) throws IOException, JSONException, NullPointerException

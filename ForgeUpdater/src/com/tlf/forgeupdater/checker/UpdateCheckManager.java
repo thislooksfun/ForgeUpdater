@@ -6,11 +6,14 @@ import cpw.mods.fml.common.ModContainer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import com.tlf.forgeupdater.checker.UpdateChecker.UpdateType;
 import com.tlf.forgeupdater.common.ForgeUpdater;
+import com.tlf.forgeupdater.common.MessageDecoder.UpdaterMessage;
 
 public class UpdateCheckManager implements Runnable
 {
@@ -18,6 +21,8 @@ public class UpdateCheckManager implements Runnable
 	
 	private Map<String, UpdateChecker> checkers = new HashMap<String, UpdateChecker>();
 	private Map<String, UpdateChecker> checkersWithUpdate = new HashMap<String, UpdateChecker>();
+	private Set<UpdaterMessage> messages = new HashSet<UpdaterMessage>();
+	private Set<String> ignoreMethods = new HashSet<String>();
 	
 	private static boolean initialized = false;
 	
@@ -26,44 +31,41 @@ public class UpdateCheckManager implements Runnable
 	@Override
 	public void run()
 	{
-		if (initialized) {
-			this.refresh();
-		} else {
-			this.getUpdaters();
-		}
+		this.getUpdaters();
 		
 		UpdateCheckThreadController.instance.checking = false;
 		UpdateCheckThreadController.instance.finishCheck(this.checkersWithUpdate.size());
 	}
 	
+	public synchronized void addUpdaterMessage(UpdaterMessage message)
+	{
+		this.ignoreMethods.add(message.modID);
+		this.messages.add(message);
+	}
+	
 	private void getUpdaters()
 	{
-		if (allowAll) {
+		if (initialized) {
+			this.checkers = new HashMap<String, UpdateChecker>();
+			this.checkersWithUpdate = new HashMap<String, UpdateChecker>();
+		}
+		
+		if (allowAll || initialized) {
 			Iterator<ModContainer> iterator = Loader.instance().getActiveModList().iterator();
-			int max = Loader.instance().getActiveModList().size();
+			Iterator<UpdaterMessage> iterator2 = this.messages.iterator();
+			int max = Loader.instance().getActiveModList().size() + this.messages.size();
 			int current = 0;
 			
 			while (iterator.hasNext())
 			{
-				ModContainer mc = iterator.next();
-				System.out.println("Checking "+mc.getName()+"...");
-				this.checkClass(mc);
-				System.out.println("Done!");
+				this.checkClass(iterator.next());
 				this.percentDone = (int)(((float)++current/(float)max)*100);
 			}
-		}
-	}
-	
-	private void refresh()
-	{
-		this.checkers = new HashMap<String, UpdateChecker>();
-		this.checkersWithUpdate = new HashMap<String, UpdateChecker>();
-		
-		Iterator<ModContainer> iterator = Loader.instance().getActiveModList().iterator();
-		
-		while (iterator.hasNext())
-		{
-			this.checkClass(iterator.next());
+			while (iterator2.hasNext())
+			{
+				this.buildChecker(iterator2.next());
+				this.percentDone = (int)(((float)++current/(float)max)*100);
+			}
 		}
 	}
 	
@@ -72,6 +74,10 @@ public class UpdateCheckManager implements Runnable
 		String name = mc.getName();
 		Object mod = mc.getMod();
 		Class clazz = (mod == null ? null : mod.getClass());
+		if (ignoreMethods.contains(mc.getModId())) {
+			return;
+		}
+		
 		if (!name.equals("Minecraft Coder Pack") && !name.equals("Forge Mod Loader") && !name.equals("Minecraft Forge"))
 		{
 			if (clazz == null) {
@@ -177,7 +183,6 @@ public class UpdateCheckManager implements Runnable
 				
 				if (allowed) {
 					try {
-						System.out.println("Building checker for " + name);
 						this.buildChecker(mc, id, minType, formats);
 					} catch (IllegalArgumentException e) {
 						e.printStackTrace();
@@ -187,6 +192,15 @@ public class UpdateCheckManager implements Runnable
 		}
 	}
 	
+	private void buildChecker(UpdaterMessage message) throws IllegalArgumentException
+	{
+		ModContainer mc = Loader.instance().getIndexedModList().get(message.modID);
+		if (mc != null) {
+			buildChecker(mc, message.curseID, message.minType, message.fileTemplates);
+		} else {
+			System.err.println("There is no ModContainer for " + message.modID);
+		}
+	}
 	private void buildChecker(ModContainer mc, String curseID, UpdateType minType, String[] fileFormats) throws IllegalArgumentException
 	{
 		if (curseID.equals("")) {
