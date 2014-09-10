@@ -1,5 +1,8 @@
 ForgeUpdater changelog:
 
+1.3.1:
+* Updated to 1.7.10
+
 1.3.0:
 * Made checking threaded: this means version checking will happen in the background, and should improve performance.
 * Made registering your mod even easier. (Don't worry, the old method will still work, for a couple versions)

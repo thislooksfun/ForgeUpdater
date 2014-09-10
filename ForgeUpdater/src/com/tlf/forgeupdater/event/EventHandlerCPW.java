@@ -21,7 +21,7 @@ public class EventHandlerCPW
 	@SubscribeEvent
 	public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
 	{
-		if (MinecraftServer.getServer().isSinglePlayer() || (!client && TLFUtils.isStringInArray(MinecraftServer.getServer().getConfigurationManager().func_152606_n(), event.player.getCommandSenderName().toLowerCase())))
+		if (MinecraftServer.getServer().isSinglePlayer() || (!client && TLFUtils.isPlayerOp(event.player.getCommandSenderName())))
 		{
 			UpdateCheckThreadController.instance.onPlayerConnect(event.player);
 		}
