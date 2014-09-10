@@ -7,6 +7,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 
 import com.tlf.forgeupdater.checker.UpdateCheckThreadController;
+import com.tlf.forgeupdater.common.TLFUtils;
 
 public class EventHandlerCPW
 {
@@ -20,7 +21,7 @@ public class EventHandlerCPW
 	@SubscribeEvent
 	public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
 	{
-		if (MinecraftServer.getServer().isSinglePlayer() || (!client && MinecraftServer.getServer().getConfigurationManager().getOps().contains(event.player.getCommandSenderName().toLowerCase())))
+		if (MinecraftServer.getServer().isSinglePlayer() || (!client && TLFUtils.isStringInArray(MinecraftServer.getServer().getConfigurationManager().func_152606_n(), event.player.getCommandSenderName().toLowerCase())))
 		{
 			UpdateCheckThreadController.instance.onPlayerConnect(event.player);
 		}

@@ -16,6 +16,7 @@ import java.util.Map;
 
 import com.tlf.forgeupdater.checker.UpdateCheckThreadController;
 import com.tlf.forgeupdater.checker.UpdateChecker;
+import com.tlf.forgeupdater.common.TLFUtils;
 
 public class CommandUpdates extends CommandBase
 {
@@ -39,7 +40,7 @@ public class CommandUpdates extends CommandBase
 	
 	@Override
 	public boolean canCommandSenderUseCommand(ICommandSender sender) {
-		return MinecraftServer.getServer().isSinglePlayer() ? true : MinecraftServer.getServer().getConfigurationManager().getOps().contains(sender.getCommandSenderName().toLowerCase());
+		return MinecraftServer.getServer().isSinglePlayer() ? true : TLFUtils.isPlayerOp(sender.getCommandSenderName());
 	}
 	
 	@Override
