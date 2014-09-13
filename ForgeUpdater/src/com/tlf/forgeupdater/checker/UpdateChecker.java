@@ -260,6 +260,7 @@ public class UpdateChecker
 				return 2;
 			}
 		}
+		@Override
 		public String toString() {
 			return this.type;
 		}

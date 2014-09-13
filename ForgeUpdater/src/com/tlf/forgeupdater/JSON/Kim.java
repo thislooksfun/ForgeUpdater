@@ -303,6 +303,7 @@ public class Kim {
      * @returns true if this and obj are both kim objects containing identical
      *          byte sequences.
      */
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Kim)) {
             return false;
@@ -335,6 +336,7 @@ public class Kim {
     /**
      * Returns a hash code value for the kim.
      */
+    @Override
     public int hashCode() {
         return this.hashcode;
     }
@@ -348,6 +350,7 @@ public class Kim {
      * @throws JSONException
      *             if the kim is not valid.
      */
+    @Override
     public String toString() throws JSONException {
         if (this.string == null) {
             int c;
