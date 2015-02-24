@@ -13,23 +13,20 @@ Modders:
 The previous method of doing this, with the @Mod.Optional annotations has been deprecated, and will be removed if/when I update to 1.8.
 
 All you have to do is add the following code to your init (FMLInitializationEvent) method:
-    FMLInterModComms.sendMessage("forgeupdater", "updaterInfo", "{id='221832-forgeupdater', minType='0', formats=['Forge_Updater-$mc-$v.jar']}");
-**The breakdown:**  
-The message you send is parsed with JSON. The required elements to have are "id", "minType" and "formats".  
+`FMLInterModComms.sendMessage("forgeupdater", "updaterInfo", "{id='[CurseForge ID]', minType='[Min Type]', formats=[Formats]}");`
+For details regarding each of these pieces, see below:
 
-{id='221832-forgeupdater', minType='0', formats=['Forge_Updater-$mc-$v.jar']}
-
-The methods
 ---
----
+####id
 **Required:** The `CurseID` for your mod. Find it at `curse.com/mc-mods/minecraft/[curseID]`  
 **Example:** This mod is at `curse/com/mc-mods/minecraft/forgeupdater`, therefore the curseID is `forgeupdater`  
 **Note:** This is the same code as you would use for the [mod] tag on the [MinecraftForums](http://minecraftforum.net)
 
 ---
-###formats
+####formats
 **Optional, but *strongly* reccomended:** The file format(s) to use for this mod, where $mc = minecraft version; $v = mod version.  
-**Example:** This mod is `{Forge_Updater-$mc-$v.jar}`, and my mod (Hide Names)[http://minecraft.curseforge.com/mc-mods/62786-hide-names] returns `{"Hide_Names-$mc-$v.jar", "HideNames_v$v_MC_$mc.jar"}`  
+**Format:** String array "[]" - 
+**Example:** This mod is `['Forge_Updater-$mc-$v.jar']`, and my mod (Hide Names)[http://minecraft.curseforge.com/mc-mods/62786-hide-names] returns `['Hide_Names-$mc-$v.jar', 'HideNames_v$v_MC_$mc.jar']`  
 **Note 1:** All spaces in the resulting string will be replaced with underscores  
 **Note 2:** The `$mc` section is optional, but `$v` is required  
 **Note 3:** If not found, the file pattern defaults to the pattern `[name]-$mc-$v.(jar|zip)` where `[name]` is your mod name with all spaces replaced with underscores (_)
