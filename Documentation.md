@@ -8,6 +8,24 @@ End-users:
 
 Modders:
 ===
+All you have to do is add the following code to your init (FMLInitializationEvent) method:
+    FMLInterModComms.sendMessage("forgeupdater", "updaterInfo", "{id='221832-forgeupdater', minType='0', formats=['Forge_Updater-$mc-$v.jar']}");
+**The breakdown:**  
+The message you send is parsed with JSON. The required elements to have are "id", "minType" and "formats".  
+---
+**Required:** The `CurseID` for your mod. Find it at `curse.com/mc-mods/minecraft/[curseID]`  
+**Example:** This mod is at `curse/com/mc-mods/minecraft/221832-forgeupdater`, therefore the curseID is `221832-forgeupdater`
+---
+**Optional:** The minimum release type to be checked for. 0 = alpha; 1 = beta; 2 = release.  
+**Example:** Returning 1 will allow beta and release builds, but not alpha builds.
+**Note 1:** By default this will be `2`
+
+{id='221832-forgeupdater', minType='0', formats=['Forge_Updater-$mc-$v.jar']}
+
+
+== OLD INFORMATION ==
+This system has been left in for legacy purposes, but you should not use it, as it will go away if/when I eventually update to 1.8
+
 I tried to make this as easy to implement as possible, and I think I did a pretty good job. You don't have to add any dependencies to your mod(s), and you don't have to worry about anything crashing if this isn't installed. All you have to do is add the following methods to your main mod class (the one with @Mod). That's it. These can be in any order you want, just make sure they have the same name and return types otherwise it will not work!  
 If you don't know what the `@Optional.Method` annotation does, Minalien has a great page about it [here](http://minalien.com/minecraft-forge-feature-spotlight-optional-annotation/).
 
