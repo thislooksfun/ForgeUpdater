@@ -37,8 +37,8 @@ For details regarding each of these pieces, see below:
 ####minType
 **Optional:** The minimum release type to be checked for. 0 = alpha; 1 = beta; 2 = release.  
 **Format:** A string ("'a'"); containing either 0, 1, or 2.  
-**Example:** Returning 1 will allow beta and release builds, but not alpha builds.
-**Note 1:** By default this will be `2`
+**Example:** Returning 1 will allow beta and release builds, but not alpha builds.  
+**Note:** By default this will be `2`
 
 
 ---
