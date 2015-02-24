@@ -9,7 +9,7 @@ End-users:
 Modders:
 ===
 
-==NOTE:
+** NOTE:
 The previous method of doing this, with the @Mod.Optional annotations has been deprecated, and will be removed if/when I update to 1.8.
 
 All you have to do is add the following code to your init (FMLInitializationEvent) method:
