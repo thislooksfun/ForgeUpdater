@@ -29,7 +29,7 @@ For details regarding each of these pieces, see below:
 **Format:** A string array ("['a', 'b']") containing the file name patterns to look for, in order.  
 **Example:** This mod is `['Forge_Updater-$mc-$v.jar']`, and my mod (Hide Names)[http://minecraft.curseforge.com/mc-mods/62786-hide-names] returns `['Hide_Names-$mc-$v.jar', 'HideNames_v$v_MC_$mc.jar']`  
 **Note 1:** All spaces in the resulting string will be replaced with underscores  
-**Note 2:** This must be in the order they should be checked. 
+**Note 2:** This must be in the order they should be checked.  
 **Note 3:** The `$mc` section is optional, but `$v` is required  
 **Note 4:** If not found, the file pattern defaults to the pattern `[name]-$mc-$v.(jar|zip)` where `[name]` is your mod name with all spaces replaced with underscores (_)
 
